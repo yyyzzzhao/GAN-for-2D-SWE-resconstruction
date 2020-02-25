@@ -6,7 +6,7 @@
 
 + **model structure**
 
-<img src='img/model.jpg' width="600px"/>
+<img src='img/model.jpg' align='center' width="600px"/>
 
 + **show some examples**
 
