@@ -8,4 +8,4 @@
 
 | Conventional US | Elastography | Resconstruction Ela |
 |:----------------|:------------:|:-------------------:|
-|!['']('./img/gray.jpg') | !['']('./img/ela.jpg') | !['']('./img/ela_rec.jpg') |
+|![]('img/gray.jpg') | ![]('img/ela.jpg') | ![]('img/ela_rec.jpg') |
