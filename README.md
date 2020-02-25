@@ -4,7 +4,11 @@
 
 -------
 
-+ **some examples**
++ **model structure**
+
+<img src='img/model.jpg' width="600px"/>
+
++ **show some examples**
 
 | Conventional US | Elastography | Resconstruction Ela |
 |:----------------|:------------:|:-------------------:|
