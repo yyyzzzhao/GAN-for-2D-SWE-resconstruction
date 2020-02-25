@@ -7,6 +7,11 @@ class ColorUSGANModel(BaseModel):
 	def name(self):
 		return 'ColorUSGANModel'
 
+	@staticmethod
+	def modify_commandline_options(parser, is_train=True):
+		parser.set_defaults(norm='batch', netG='unet_256', dataset_mode='mask')
+		return parser
+
 	def __init__(self, opt):
 		BaseModel.__init__(self, opt)
 		self.isTrain = opt.isTrain
@@ -20,9 +25,9 @@ class ColorUSGANModel(BaseModel):
 		else:
 			self.model_names = ['G_p1', 'G_p2']
 
-		self.netG_p1 = networks.define_G_multi(opt.input_nc, opt.ngf, opt.netG_p1, opt.norm, 
-												not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
-		self.netG_p2 = networks.define_G(4, 3, opt.ngf, opt.netG_p2, opt.norm, 
+		self.netG_p1 = networks.define_G(opt.input_nc, 3, opt.ngf, opt.netG_p1, opt.norm, 
+											not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
+		self.netG_p2 = networks.define_G(5, 3, opt.ngf, opt.netG_p2, opt.norm, 
 											not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
 
 		if self.isTrain:
@@ -49,12 +54,12 @@ class ColorUSGANModel(BaseModel):
 		AtoB = self.opt.direction == 'AtoB'
 		self.real_A = input['A' if AtoB else 'B'].to(self.device)
 		self.real_B = input['B' if AtoB else 'B'].to(self.device)
-		self.real_mask = input['mask']
+		self.real_mask = input['M'].to(self.device)
 
-	def foward(self):
+	def forward(self):
 		self.fake_b, self.fake_mask = self.netG_p1(self.real_A)
-		combine_Ab = torch.cat((self.real_A, self.fake_b), 1)
-		self.fake_B = self.netG_p2(combine_Ab, self.fake_mask.detach())
+		combine_Abm = torch.cat((self.real_A, self.fake_b, self.fake_mask), 1)
+		self.fake_B = self.netG_p2(combine_Abm)
 
 	def backward_D(self):
 		"""Calculate GAN loss for the discriminator"""
@@ -75,7 +80,7 @@ class ColorUSGANModel(BaseModel):
 		fake_AB = torch.cat((self.real_A, self.fake_B), 1)
 		pred_fake_AB = self.netD(fake_AB)
 		self.loss_G_GAN = self.criterionGAN(pred_fake_AB, True)
-		self.loss_G_L1 = self.criterionL1(self.fake_B, self.real_B) * self.opt.lambda_L1
+		self.loss_G_L1 = (self.criterionL1(self.fake_b, self.real_B) + self.criterionL1(self.fake_B, self.real_B)) * self.opt.lambda_L1 / 2.0
 		# flatten fake_mask and real_mask
 		fake_mask_f = self.fake_mask.view(-1)
 		real_mask_f = self.real_mask.view(-1)

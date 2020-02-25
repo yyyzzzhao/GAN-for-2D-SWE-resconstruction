@@ -23,7 +23,7 @@ from models.base_model import BaseModel
 
 
 def find_model_using_name(model_name):
-    """Import the module "models/[model_name]_model.py".
+    """Import the module "models/[model_name]_model.py".  colorusgan
 
     In the file, the class called DatasetNameModel() will
     be instantiated. It has to be a subclass of BaseModel,
@@ -32,10 +32,12 @@ def find_model_using_name(model_name):
     model_filename = "models." + model_name + "_model"
     modellib = importlib.import_module(model_filename)
     model = None
-    target_model_name = model_name.replace('_', '') + 'model'
+    target_model_name = model_name.replace('_', '') + 'model'    # colorusganmodel
+    # print(model_filename, target_model_name)
     for name, cls in modellib.__dict__.items():
         if name.lower() == target_model_name.lower() \
            and issubclass(cls, BaseModel):
+            print(name)
             model = cls
 
     if model is None:

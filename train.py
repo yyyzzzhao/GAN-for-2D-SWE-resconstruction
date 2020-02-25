@@ -15,7 +15,7 @@ from data import create_dataset
 from models import create_model
 from util.visualizer import Visualizer
 
-def main_train():
+if __name__ == '__main__':
 	opt = TrainOptions().parse()
 	dataset = create_dataset(opt)
 	dataset_size = len(dataset)
@@ -59,13 +59,11 @@ def main_train():
 				model.save_networks(save_suffix)
 
 			iter_data_time = time.time()
-			if epoch % opt.save_epoch_freq == 0:
-				print('saving the model at the end of epoch %d, iters %d' % (epoch, total_iters))
-				model.save_networks('latest')
-				model.save_networks(epoch)
+		if epoch % opt.save_epoch_freq == 0:
+			print('saving the model at the end of epoch %d, iters %d' % (epoch, total_iters))
+			model.save_networks('latest')
+			model.save_networks(epoch)
 
-			print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.niter + opt.niter_decay, time.time() - epoch_start_time))
-			model.update_learning_rate()
+		print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.niter + opt.niter_decay, time.time() - epoch_start_time))
+		model.update_learning_rate()
 
-
-main_train()
